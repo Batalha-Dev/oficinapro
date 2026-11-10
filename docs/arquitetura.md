@@ -6,7 +6,7 @@
 Navegador (React, :5173)
    │  fetch /api/...   (proxy do Vite em desenvolvimento)
    ▼
-Express (:3333)
+Express (:3333)   middleware autenticar (JWT) protege tudo exceto /auth e /health
    routes → controllers → services → Prisma Client
    │                                      │
    └── errorHandler (erros → JSON)        ▼
@@ -47,4 +47,10 @@ Cliente 1 ── N Veiculo 1 ── N OrdemServico 1 ── N ItemServico
 | Express 5 | Repassa erros de funções `async` ao errorHandler sem `try/catch` em cada controller. |
 | Proxy do Vite para `/api` | Evita configurar CORS e URLs absolutas no frontend. |
 | Componente `Crud` genérico no frontend | Clientes e Veículos compartilham lista, modal, erro e exclusão; só mudam colunas e formulário. |
+| Login com JWT no cabeçalho `Authorization` (não cookie) | É stateless e simples de testar com supertest. Expira em 8 h (um turno). O token fica no `localStorage`; com XSS seria vulnerável, mas o React escapa todo o texto renderizado e não usamos `dangerouslySetInnerHTML`. |
+| Mesma mensagem para e-mail inexistente e senha errada | Não revela quais e-mails estão cadastrados. |
+| Middleware `autenticar` aplicado no roteador, depois de `/auth` | Uma linha protege todas as rotas de negócio; uma rota nova já nasce protegida. |
+| Busca e "pode soltar aqui?" em `frontend/src/lib/kanban.js` | Funções puras, testadas com Vitest sem renderizar nada. |
+| Seed com `TRUNCATE … RESTART IDENTITY` | A demonstração sempre começa na OS #1. |
+| CI em Node 22 **e** 24 | Prova que o projeto roda nos dois extremos da faixa de versão exigida. |
 | Estilos em tokens CSS (`:root`) | O visual pode ser refinado depois trocando apenas variáveis. |
