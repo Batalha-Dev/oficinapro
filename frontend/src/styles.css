@@ -156,3 +156,95 @@ textarea { resize: vertical; }
   .tabela td[data-titulo]::before { content: attr(data-titulo); color: var(--texto-suave); font-size: 0.85rem; }
   .tabela td.acoes { justify-content: flex-end; padding-top: 8px; }
 }
+
+/* ===== Refinamento visual: "chão de oficina" =====
+   Grafite + laranja de segurança, títulos condensados de placa de sinalização,
+   placa Mercosul nos cards e faixa zebrada como assinatura. */
+:root {
+  --bg: #f2f0eb;
+  --borda: #dedad1;
+  --grafite: #1a1c1f;
+  --grafite-2: #26292e;
+  --primaria: #d9480f;          /* 4.9:1 com branco (AA) */
+  --primaria-escura: #b33c0c;
+  --mercosul: #1f4fa8;
+  --display: 'Barlow Condensed', 'Inter', system-ui, sans-serif;
+  --raio: 8px;
+  --zebra: repeating-linear-gradient(-45deg, var(--primaria) 0 10px, var(--grafite) 10px 20px);
+}
+h1 { font-family: var(--display); font-size: 2.1rem; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
+h2 { letter-spacing: 0.08em; }
+
+.topbar { background: var(--grafite); border-bottom: 0; box-shadow: 0 1px 0 rgb(0 0 0 / 30%); }
+.topbar::after { content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 4px; background: var(--zebra); }
+.marca { font-family: var(--display); font-size: 1.45rem; letter-spacing: 0.02em; text-transform: uppercase; }
+.marca-icone { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 6px; background: var(--primaria); color: #fff; }
+.nav a { min-height: 40px; display: inline-flex; align-items: center; }
+.nav a.ativo { background: rgb(255 255 255 / 10%); box-shadow: inset 0 -2px 0 var(--primaria); border-radius: 6px 6px 0 0; }
+.conteudo { padding-top: 36px; }
+.cabecalho { padding-bottom: 1.25rem; border-bottom: 1px solid var(--borda); }
+.sub { font-size: 0.95rem; }
+
+.btn { min-height: 40px; border-radius: 6px; font-weight: 600; }
+.btn-sm { min-height: 32px; }
+.btn-primario { box-shadow: 0 1px 0 var(--primaria-escura), 0 2px 6px rgb(217 72 15 / 25%); }
+.btn:focus-visible, .nav a:focus-visible, .card-link:focus-visible, .voltar:focus-visible { outline: 2px solid var(--primaria); outline-offset: 2px; }
+
+/* Kanban: colunas como baias da oficina */
+.coluna { background: #e9e6df; border: 0; border-top: 3px solid var(--cor); border-radius: 4px 4px 10px 10px; padding: 10px; }
+.coluna-topo h2 { font-family: var(--display); font-size: 1.05rem; letter-spacing: 0.04em; }
+.contador { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--texto); }
+.coluna-vazia { border: 1.5px dashed #cdc8bd; border-radius: 8px; padding: 18px 10px; text-align: center; }
+.card-os { border-left: 1px solid var(--borda); border-radius: var(--raio); animation: entrar 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.card-os:nth-child(3) { animation-delay: 30ms; } .card-os:nth-child(4) { animation-delay: 60ms; } .card-os:nth-child(n+5) { animation-delay: 90ms; }
+.card-os:hover { transform: translateY(-2px); border-color: #c9c3b7; box-shadow: 0 6px 18px rgb(26 28 31 / 10%); }
+.card-link { border-radius: var(--raio) var(--raio) 0 0; }
+.card-desc { font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.card-link > .card-linha:last-child { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--borda); }
+.valor { font-family: var(--mono); font-size: 0.92rem; }
+.os-num { font-family: var(--mono); font-weight: 600; }
+@keyframes entrar { from { opacity: 0; transform: translateY(6px); } }
+
+/* Placa Mercosul */
+.placa { position: relative; padding: 7px 8px 1px; border: 1.5px solid var(--grafite); border-radius: 4px; background: #fff; color: var(--grafite); line-height: 1.2; overflow: hidden; }
+.placa::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: var(--mercosul); }
+.placa-grande { padding: 12px 12px 3px; font-size: 1.3rem; }
+.placa-grande::before { height: 8px; }
+
+.badge { border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.7rem; padding: 3px 8px; }
+.badge-em_andamento { --cor: #b35c00; }   /* AA com texto branco */
+.badge-cancelada { --cor: #6b7178; }
+
+/* Tabelas e painéis */
+.tabela-wrap, .painel { border-radius: 10px; }
+.tabela th { font-size: 0.72rem; letter-spacing: 0.08em; background: #f4f2ed; }
+.tabela tbody tr { transition: background 0.12s; }
+.painel { border-top: 3px solid var(--grafite); }
+.total { border-top: 0; margin-top: 12px; padding: 14px 16px; background: var(--grafite); color: #fff; border-radius: 6px; }
+.total strong { font-family: var(--mono); }
+
+.modal { border-radius: 10px; border-top: 4px solid transparent; border-image: var(--zebra) 4 0 0 0 / 4px 0 0 0; }
+.modal-topo h2 { font-family: var(--display); font-size: 1.5rem; text-transform: uppercase; }
+.btn-icone { min-width: 40px; min-height: 40px; border-radius: 6px; }
+.btn-icone:hover { background: var(--superficie-2); color: var(--texto); }
+input, select, textarea { min-height: 42px; border-radius: 6px; border-color: #d3cec4; transition: border-color 0.15s; }
+input:hover, select:hover, textarea:hover { border-color: #b9b3a7; }
+
+@media (max-width: 720px) {
+  h1 { font-size: 1.75rem; }
+  .marca span:last-child { display: inline; }
+  .topbar { gap: 0.75rem; }
+  .nav a { padding: 0.45rem 0.6rem; font-size: 0.9rem; }
+  .btn-sm { min-height: 40px; }
+  .card-acoes .btn { flex: 1; justify-content: center; }
+}
+@media (max-width: 420px) {
+  .marca span:last-child { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+@media (max-width: 420px) {
+  .topbar { padding: 0 12px; gap: 0.5rem; }
+  .nav a { padding: 0.4rem 0.45rem; font-size: 0.84rem; }
+}
