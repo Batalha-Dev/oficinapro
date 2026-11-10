@@ -1,0 +1,46 @@
+# Documentação do Uso de IA — OficinaPro
+
+## Ferramenta e método
+
+- **Agente:** Claude Code (modelo Claude Opus 5.5), no aplicativo desktop do Claude, com o plugin **Superpowers**, que impõe um fluxo de engenharia: *brainstorming → spec escrita → plano de implementação → execução com TDD → revisão*.
+- **Nosso papel:** atuamos como **revisores de código** do agente. Definimos o domínio, aprovamos a spec e o plano antes de qualquer código, e cada entrega só foi aceita depois de passar nos critérios abaixo.
+
+### Critérios de aceitação usados para todo código gerado
+
+1. **Testes automatizados passando** (`npm test`, 46 testes): nenhuma funcionalidade foi aceita sem teste cobrindo a regra de negócio.
+2. **Separação de responsabilidades:** routes sem lógica, controllers sem acesso ao banco, regras só nos services.
+3. **Status HTTP corretos** (201/204/400/404/409/422) e erros em JSON padronizado, sem vazar stack trace.
+4. **Versões dentro do exigido:** Node 22–24 (`engines`) e `postgres:16-alpine` (nunca `latest`).
+5. **Verificação manual no navegador** em desktop e celular (375 px) antes de cada commit de frontend.
+6. **Commits semânticos** ligados às issues do kanban (`Closes #n`).
+
+### Artefatos de processo gerados com a IA
+
+- Spec: [`docs/superpowers/specs/2026-11-09-oficina-mecanica-design.md`](docs/superpowers/specs/2026-11-09-oficina-mecanica-design.md)
+- Plano: [`docs/superpowers/plans/2026-11-09-oficinapro.md`](docs/superpowers/plans/2026-11-09-oficinapro.md)
+
+---
+
+## Tabela de interações
+
+| Problema / Requisito | Prompts utilizados | Refinamento (iterações) | Decisão de engenharia |
+|---|---|---|---|
+| **1. Entender o trabalho** | "estude e analise o que foi pedido" (com o PDF das diretrizes anexado) | A IA não conseguiu ler o PDF diretamente (faltava o `poppler`), instalou `pypdf` numa pasta temporária e extraiu o texto. Também conferiu as versões instaladas (Node 24.13, Docker 29.7) contra os limites exigidos. | Aceitamos o resumo depois de conferir com o PDF original. Ele destacou riscos que não tínhamos visto: fixar `postgres:16` (a imagem `latest` quebraria a regra de versão) e registrar os prompts *durante* o trabalho. |
+| **2. Escolha do domínio e escopo** | "use o plugin superpower projeto todo ele faça as spec e comece a programar e produzir tudo conforme necessario" | A IA classificou o pedido como *arquitetural* e, antes de programar, perguntou o tema com 4 opções. Escolhemos **Oficina mecânica**. Ela propôs 3 abordagens (monorepo Express+React, EJS, Next.js) e recomendou a primeira. | Rejeitamos o Next.js, porque fugiria do "Express obrigatório". Cortamos login, estoque e pagamento (YAGNI), deixando para a parte 2. O critério foi caber no prazo com regras de negócio de verdade. |
+| **3. Spec e plano** | "coloquei o comando e revisado manda bala" (aprovação da spec) | A spec definiu 7 regras de negócio numeradas (RN1–RN7). O plano incluiu uma seção de "Review Focus" com casos que nenhum teste cobria (ID não numérico, e-mail vazio, valor monetário em string), e cada um virou teste. | Aprovamos porque cada regra é verificável por teste. A numeração RN1–RN7 é usada nos commits e nos testes, o que dá rastreabilidade requisito → código. |
+| **4. Infra: Docker + PostgreSQL** | (derivado do PROMPT 1 das diretrizes) "docker-compose para dev com PostgreSQL 16, variáveis de ambiente, volume nomeado" | **Não funcionou de primeira.** O Docker Desktop não iniciava. A IA leu o log (`com.docker.backend.exe.log`) e achou a causa: arquivos de socket órfãos (`sailor-ingest.sock`, `engine.sock`) de uma sessão anterior que o Windows não deixava apagar. A primeira correção (matar o processo) **piorou** o problema, porque deixou novos sockets órfãos. A solução foi renomear as pastas `run/` e `docker-secrets-engine/` e reiniciar sem interromper. | Mantivemos o `healthcheck` com `pg_isready` e um script de init que cria o banco `oficina_test`. Assim os testes nunca apagam os dados de demonstração. A imagem `alpine` é menor e sobe mais rápido na apresentação. |
+| **5. Schema Prisma** | (derivado do PROMPT 2) "schema.prisma com Cliente 1:N Veiculo 1:N OrdemServico 1:N ItemServico, enum de status" | Funcionou de primeira. Revisamos as regras de exclusão: a IA usou `onDelete: Restrict` em veículo/OS e `Cascade` só nos itens. | Aprovado por **integridade**: mesmo que alguém chame o banco direto, o histórico de OS não pode ser apagado. O valor fica em `Decimal(10,2)`, nunca `Float`, porque é dinheiro. |
+| **6. Validação e erros** | "AppError, errorHandler central, schemas zod, normalização de placa" | Na primeira tentativa, o terminal quebrou com um `heredoc` (caracteres especiais em português). A IA passou a gravar os arquivos pela ferramenta de escrita. Os 11 testes de validação passaram em seguida. | Um único `errorHandler` converte `ZodError → 400`, erro de unicidade do Prisma (`P2002`) `→ 409` com mensagem legível ("Já existe um cadastro com este(a) CPF") e o resto `→ 500` **sem vazar a stack** (segurança). |
+| **7. CRUD de Clientes, Veículos e Ordens** | (derivado do PROMPT 3) "API RESTful com controller CRUD, rotas, tratamento de erros e status HTTP corretos", com as regras RN1–RN7 | **Falhou na primeira execução:** 17 de 46 testes quebraram com "the URL must start with postgresql://". Investigando, a IA descobriu que `process.loadEnvFile` não altera o `process.env` isolado do Jest. Trocou por leitura manual com `util.parseEnv`, e os 46 testes passaram. | Usamos Express 5, que repassa erros de funções `async` sem `try/catch` em cada controller. O PROMPT 3 das diretrizes pedia `try/catch`, mas aqui o tratamento centralizado tem o mesmo efeito com menos repetição. O total da OS é **calculado no servidor em centavos inteiros** (evita `0.1 + 0.2`). |
+| **8. Fluxo de status da OS** | "máquina de estados: ABERTA→EM_ANDAMENTO/CANCELADA, EM_ANDAMENTO→CONCLUIDA/CANCELADA; OS fechada não aceita edição" | Funcionou de primeira. Há 8 testes cobrindo transições válidas e inválidas (pular de Aberta para Concluída retorna 422). | A regra mora num arquivo puro (`statusOS.js`), testável sem banco. O frontend copia a tabela **só para decidir quais botões mostrar**. Quem valida de fato é o backend. |
+| **9. Frontend React** | (derivado do PROMPT 4) "React consumindo a API com Fetch, tratando loading, erro de rede e renderizando de forma limpa e responsiva", mais um kanban de OS | Funcionou, mas a verificação no navegador revelou **um bug de layout**: o formulário de item aparecia empilhado porque a regra `.form` sobrescrevia `.form-item`. Corrigido aumentando a especificidade do seletor. Também testamos em 375 px (celular) e a regra RN2 pela tela ("Cliente possui veículos cadastrados…"). | Criamos um componente `Crud` genérico para não duplicar lista, modal e erros entre Clientes e Veículos. Todo acesso à API passa por `api/client.js`, que transforma falha de rede em mensagem clara. As cores ficam em variáveis CSS para facilitar o refinamento visual depois. |
+| **10. GitHub e Kanban** | "pode criar o repositorio … monta tudo do github, monta o github projects tira os print deixa tudo pronto" | O `gh` não tinha a permissão `project`. Rodamos `gh auth refresh -s project`. A IA criou o repositório, o Project, 7 issues e uma visão em quadro (pela API GraphQL), e escreveu `scripts/kanban-status.sh` para mover os cartões. Os prints foram tirados com Playwright a cada etapa. | Usamos o GitHub Projects (opção recomendada nas diretrizes) porque fica integrado aos commits: cada `Closes #n` fecha a issue. Isso mostra o histórico de evolução que o professor pede. |
+
+---
+
+## Postura crítica: o que **não** aceitamos da IA sem ajuste
+
+- **Correção que piorava o problema:** forçar o encerramento do Docker gerava novos sockets órfãos. Interrompemos essa abordagem e adotamos a de renomear as pastas.
+- **Teste "verde" falso:** na primeira rodada, 3 suítes "passaram" mesmo sem banco. A falha só apareceu ao rodar a suíte isolada. Passamos a sempre conferir o total de testes (46/46), não só o nome da suíte.
+- **Divergência do PROMPT 3** (`try/catch` em cada método): mantivemos o tratamento central e justificamos tecnicamente (Express 5).
+- **Escopo:** funcionalidades como login e estoque foram propostas como possibilidade e **deixadas de fora de propósito** (YAGNI), documentadas como candidatas à parte 2.
