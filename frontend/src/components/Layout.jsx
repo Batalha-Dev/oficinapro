@@ -6,7 +6,7 @@ const links = [
   { to: '/veiculos', label: 'Veículos' },
 ];
 
-export default function Layout() {
+export default function Layout({ usuario, onSair }) {
   return (
     <div className="app">
       <header className="topbar">
@@ -34,6 +34,12 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+        <div className="usuario">
+          <span className="usuario-nome">{usuario?.nome}</span>
+          <button className="btn btn-sm btn-sair" onClick={onSair}>
+            Sair
+          </button>
+        </div>
       </header>
       <main className="conteudo">
         <Outlet />

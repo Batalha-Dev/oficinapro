@@ -1,5 +1,6 @@
 // Dados de demonstração para a apresentação. Idempotente: limpa e recria.
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
@@ -8,6 +9,14 @@ async function main() {
   await prisma.$executeRawUnsafe(
     'TRUNCATE TABLE "ItemServico", "OrdemServico", "Veiculo", "Cliente" RESTART IDENTITY CASCADE'
   );
+
+  // Usuário de demonstração (somente ambiente local). Credenciais no README.
+  const senhaHash = await bcrypt.hash('oficina123', 10);
+  await prisma.usuario.upsert({
+    where: { email: 'mecanico@oficinapro.com' },
+    update: { senhaHash },
+    create: { nome: 'Mecânico Demo', email: 'mecanico@oficinapro.com', senhaHash },
+  });
 
   const ana = await prisma.cliente.create({
     data: { nome: 'Ana Souza', telefone: '(49) 99911-2233', email: 'ana.souza@email.com', cpf: '52998224725' },

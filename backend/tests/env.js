@@ -10,3 +10,4 @@ for (const [chave, valor] of Object.entries(arquivo)) {
   if (process.env[chave] === undefined) process.env[chave] = valor;
 }
 process.env.DATABASE_URL = process.env.DATABASE_URL_TEST;
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'segredo-de-teste';

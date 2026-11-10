@@ -1,14 +1,46 @@
-// Único ponto de acesso à API: padroniza JSON, erros e mensagens do servidor.
+// Único ponto de acesso à API: padroniza JSON, token, erros e mensagens do servidor.
+const CHAVE_SESSAO = 'oficinapro.sessao';
+
+export const sessao = {
+  ler() {
+    try {
+      return JSON.parse(localStorage.getItem(CHAVE_SESSAO));
+    } catch {
+      return null;
+    }
+  },
+  salvar(dados) {
+    try {
+      localStorage.setItem(CHAVE_SESSAO, JSON.stringify(dados));
+    } catch {
+      /* navegador sem storage: a sessão dura só esta aba */
+    }
+  },
+  limpar() {
+    try {
+      localStorage.removeItem(CHAVE_SESSAO);
+    } catch {
+      /* idem */
+    }
+  },
+};
+
 async function request(method, path, body) {
+  const token = sessao.ler()?.token;
+  const headers = {};
+  if (body) headers['Content-Type'] = 'application/json';
+  if (token) headers.Authorization = `Bearer ${token}`;
+
   let res;
   try {
-    res = await fetch(`/api${path}`, {
-      method,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    res = await fetch(`/api${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
   } catch {
     throw new Error('Não foi possível conectar à API. Verifique se o backend está rodando.');
+  }
+  // Token ausente/expirado em rota protegida: avisa o App para voltar ao login.
+  if (res.status === 401 && path !== '/auth/login') {
+    sessao.limpar();
+    window.dispatchEvent(new Event('oficinapro:sessao-expirada'));
   }
   if (res.status === 204) return null;
   const dados = await res.json().catch(() => null);

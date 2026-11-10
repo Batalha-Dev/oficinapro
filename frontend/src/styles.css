@@ -957,3 +957,225 @@ textarea:hover {
     font-size: 0.84rem;
   }
 }
+
+/* ===== Novas funcionalidades: login, KPIs, busca, arrastar, histórico ===== */
+.topbar {
+  justify-content: flex-start;
+}
+.usuario {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+.usuario-nome {
+  color: #c9c4ba;
+  font-size: 0.9rem;
+}
+.btn-sair {
+  background: transparent;
+  color: #f5f3ef;
+  border-color: rgb(255 255 255 / 25%);
+}
+.btn-sair:hover {
+  background: rgb(255 255 255 / 10%);
+  border-color: rgb(255 255 255 / 40%);
+}
+
+/* Login */
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: radial-gradient(circle at 20% 10%, rgb(217 72 15 / 18%), transparent 45%), var(--grafite);
+  position: relative;
+}
+.login-faixa {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 8px;
+  background: var(--zebra);
+}
+.login-cartao {
+  width: min(400px, 100%);
+  background: var(--superficie);
+  border-radius: 10px;
+  padding: 28px 26px;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 35%);
+  border-top: 4px solid var(--primaria);
+}
+.login-marca {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.login-marca .marca-icone {
+  width: 38px;
+  height: 38px;
+}
+.login .sub {
+  margin-top: -6px;
+}
+.btn-largo {
+  width: 100%;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* KPIs */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-left: 4px solid var(--primaria);
+  border-radius: 8px;
+}
+.kpi-rotulo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--texto-suave);
+}
+.kpi-valor {
+  font-family: var(--mono);
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-compacto {
+  min-width: 220px;
+}
+
+/* Busca */
+.barra-busca {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.barra-busca input {
+  max-width: 460px;
+  background: var(--superficie)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b665d' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E")
+    no-repeat 12px center;
+  padding-left: 36px;
+}
+.dica-arrastar {
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+/* Arrastar e soltar */
+.card-os[draggable='true'] {
+  cursor: grab;
+}
+.card-arrastando {
+  opacity: 0.45;
+}
+.coluna {
+  transition:
+    background 0.15s,
+    outline-color 0.15s,
+    opacity 0.15s;
+  outline: 2px dashed transparent;
+  outline-offset: -2px;
+}
+.coluna-aceita {
+  outline-color: var(--cor);
+}
+.coluna-alvo {
+  background: color-mix(in srgb, var(--cor) 14%, #e9e6df);
+}
+.coluna-bloqueada {
+  opacity: 0.55;
+}
+
+/* Histórico do veículo */
+.link-historico {
+  font-weight: 600;
+  color: var(--primaria-escura);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.link-historico:hover {
+  text-decoration: underline;
+}
+.linha-tempo {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 22px;
+  border-left: 3px solid var(--borda);
+  display: grid;
+  gap: 14px;
+}
+.marco {
+  position: relative;
+}
+.marco::before {
+  content: '';
+  position: absolute;
+  left: -32px;
+  top: 18px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--cor);
+  border: 3px solid var(--bg);
+}
+.marco-aberta {
+  --cor: var(--aberta);
+}
+.marco-em_andamento {
+  --cor: var(--andamento);
+}
+.marco-concluida {
+  --cor: var(--concluida);
+}
+.marco-cancelada {
+  --cor: var(--cancelada);
+}
+.marco-cartao {
+  display: block;
+  padding: 14px 16px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: var(--sombra);
+}
+.marco-cartao:hover {
+  border-color: #c9c3b7;
+}
+.marco-cartao:focus-visible {
+  outline: 2px solid var(--primaria);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1024px) {
+  .kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 720px) {
+  .usuario-nome,
+  .dica-arrastar {
+    display: none;
+  }
+  .kpi-valor {
+    font-size: 1.1rem;
+  }
+  .barra-busca input {
+    max-width: none;
+  }
+}
