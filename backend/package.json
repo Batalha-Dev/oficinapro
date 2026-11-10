@@ -9,10 +9,11 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "setup": "prisma migrate deploy && prisma db seed",
+    "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "migrate": "prisma migrate dev",
     "seed": "prisma db seed",
-    "test": "node scripts/test-db.js && jest --runInBand"
+    "test": "node scripts/test-db.js && jest --runInBand",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
