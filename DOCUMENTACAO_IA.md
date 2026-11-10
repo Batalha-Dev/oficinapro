@@ -7,7 +7,7 @@
 
 ### Critérios de aceitação usados para todo código gerado
 
-1. **Testes automatizados passando** (`npm test`, 46 testes): nenhuma funcionalidade foi aceita sem teste cobrindo a regra de negócio.
+1. **Testes automatizados passando** (`npm test`, 48 testes): nenhuma funcionalidade foi aceita sem teste cobrindo a regra de negócio.
 2. **Separação de responsabilidades:** routes sem lógica, controllers sem acesso ao banco, regras só nos services.
 3. **Status HTTP corretos** (201/204/400/404/409/422) e erros em JSON padronizado, sem vazar stack trace.
 4. **Versões dentro do exigido:** Node 22–24 (`engines`) e `postgres:16-alpine` (nunca `latest`).
@@ -35,12 +35,13 @@
 | **8. Fluxo de status da OS** | "máquina de estados: ABERTA→EM_ANDAMENTO/CANCELADA, EM_ANDAMENTO→CONCLUIDA/CANCELADA; OS fechada não aceita edição" | Funcionou de primeira. Há 8 testes cobrindo transições válidas e inválidas (pular de Aberta para Concluída retorna 422). | A regra mora num arquivo puro (`statusOS.js`), testável sem banco. O frontend copia a tabela **só para decidir quais botões mostrar**. Quem valida de fato é o backend. |
 | **9. Frontend React** | (derivado do PROMPT 4) "React consumindo a API com Fetch, tratando loading, erro de rede e renderizando de forma limpa e responsiva", mais um kanban de OS | Funcionou, mas a verificação no navegador revelou **um bug de layout**: o formulário de item aparecia empilhado porque a regra `.form` sobrescrevia `.form-item`. Corrigido aumentando a especificidade do seletor. Também testamos em 375 px (celular) e a regra RN2 pela tela ("Cliente possui veículos cadastrados…"). | Criamos um componente `Crud` genérico para não duplicar lista, modal e erros entre Clientes e Veículos. Todo acesso à API passa por `api/client.js`, que transforma falha de rede em mensagem clara. As cores ficam em variáveis CSS para facilitar o refinamento visual depois. |
 | **10. GitHub e Kanban** | "pode criar o repositorio … monta tudo do github, monta o github projects tira os print deixa tudo pronto" | O `gh` não tinha a permissão `project`. Rodamos `gh auth refresh -s project`. A IA criou o repositório, o Project, 7 issues e uma visão em quadro (pela API GraphQL), e escreveu `scripts/kanban-status.sh` para mover os cartões. Os prints foram tirados com Playwright a cada etapa. | Usamos o GitHub Projects (opção recomendada nas diretrizes) porque fica integrado aos commits: cada `Closes #n` fecha a issue. Isso mostra o histórico de evolução que o professor pede. |
+| **11. Teste em máquina limpa e revisão independente** | "clonar o repositório do zero, seguir o README e rodar setup + testes" e, em paralelo, um agente revisor: "procure bugs de correção reais, não estilo" | **O clone limpo falhou:** o `npm run setup` quebrava com "@prisma/client did not initialize yet", porque o Prisma Client não era gerado numa máquina nova. Na nossa máquina funcionava por já existir o client gerado (o famoso "na minha máquina funciona"). A correção foi `postinstall: prisma generate` e `prisma generate` no `setup`. O revisor achou mais 8 pontos: IDs gigantes (`/clientes/99999999999`) davam **500** em vez de 400; quantidade sem limite estourava o INT4; OS cancelada podia ser **apagada**, perdendo o histórico; o confirm de exclusão mostrava `[object Object]` em Veículos; o aviso de erro antigo não sumia. Todos foram corrigidos, com 2 testes novos (48/48). | Aceitamos as correções porque cada uma tem um cenário concreto que falhava. Testar num clone limpo virou passo obrigatório antes de cada entrega: é exatamente o que acontece na apresentação ao vivo. |
 
 ---
 
 ## Postura crítica: o que **não** aceitamos da IA sem ajuste
 
 - **Correção que piorava o problema:** forçar o encerramento do Docker gerava novos sockets órfãos. Interrompemos essa abordagem e adotamos a de renomear as pastas.
-- **Teste "verde" falso:** na primeira rodada, 3 suítes "passaram" mesmo sem banco. A falha só apareceu ao rodar a suíte isolada. Passamos a sempre conferir o total de testes (46/46), não só o nome da suíte.
+- **Teste "verde" falso:** na primeira rodada, 3 suítes "passaram" mesmo sem banco. A falha só apareceu ao rodar a suíte isolada. Passamos a sempre conferir o total de testes (48/48), não só o nome da suíte.
 - **Divergência do PROMPT 3** (`try/catch` em cada método): mantivemos o tratamento central e justificamos tecnicamente (Express 5).
 - **Escopo:** funcionalidades como login e estoque foram propostas como possibilidade e **deixadas de fora de propósito** (YAGNI), documentadas como candidatas à parte 2.

@@ -15,7 +15,7 @@ Trabalho da disciplina **Laboratório de Programação** (Ciência da Computaç�
 | ORM | Prisma 6 (schema + migrações) |
 | Validação | zod |
 | Frontend | React 18 + Vite 5 + React Router |
-| Testes | Jest + supertest (46 testes) |
+| Testes | Jest + supertest (48 testes) |
 
 ## Pré-requisitos
 
