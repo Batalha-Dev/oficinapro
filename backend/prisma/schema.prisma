@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StatusOS {
+  ABERTA
+  EM_ANDAMENTO
+  CONCLUIDA
+  CANCELADA
+}
+
+model Cliente {
+  id       Int       @id @default(autoincrement())
+  nome     String
+  telefone String
+  email    String?   @unique
+  cpf      String?   @unique @db.Char(11)
+  criadoEm DateTime  @default(now())
+  veiculos Veiculo[]
+}
+
+model Veiculo {
+  id        Int            @id @default(autoincrement())
+  placa     String         @unique @db.VarChar(7)
+  marca     String
+  modelo    String
+  ano       Int
+  clienteId Int
+  cliente   Cliente        @relation(fields: [clienteId], references: [id], onDelete: Restrict)
+  ordens    OrdemServico[]
+
+  @@index([clienteId])
+}
+
+model OrdemServico {
+  id                Int           @id @default(autoincrement())
+  descricaoProblema String
+  status            StatusOS      @default(ABERTA)
+  abertaEm          DateTime      @default(now())
+  concluidaEm       DateTime?
+  veiculoId         Int
+  veiculo           Veiculo       @relation(fields: [veiculoId], references: [id], onDelete: Restrict)
+  itens             ItemServico[]
+
+  @@index([veiculoId])
+  @@index([status])
+}
+
+model ItemServico {
+  id            Int          @id @default(autoincrement())
+  descricao     String
+  quantidade    Int          @default(1)
+  valorUnitario Decimal      @db.Decimal(10, 2)
+  ordemId       Int
+  ordem         OrdemServico @relation(fields: [ordemId], references: [id], onDelete: Cascade)
+
+  @@index([ordemId])
+}
