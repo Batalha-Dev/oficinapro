@@ -9,7 +9,9 @@ afterAll(() => prisma.$disconnect());
 async function criarOS(itens = []) {
   const c = await criarCliente();
   const v = await criarVeiculo(c.id);
-  const res = await request(app).post('/api/ordens').send({ veiculoId: v.id, descricaoProblema: 'Motor falhando', itens });
+  const res = await request(app)
+    .post('/api/ordens')
+    .send({ veiculoId: v.id, descricaoProblema: 'Motor falhando', itens });
   return res.body;
 }
 
@@ -74,7 +76,9 @@ describe('API /ordens', () => {
 
   test('adiciona e remove item recalculando o total', async () => {
     const os = await criarOS();
-    const add = await request(app).post(`/api/ordens/${os.id}/itens`).send({ descricao: 'Vela', quantidade: 4, valorUnitario: 25.25 });
+    const add = await request(app)
+      .post(`/api/ordens/${os.id}/itens`)
+      .send({ descricao: 'Vela', quantidade: 4, valorUnitario: 25.25 });
     expect(add.status).toBe(201);
     expect(add.body.valorTotal).toBe(101);
     const itemId = add.body.itens[0].id;
@@ -101,7 +105,9 @@ describe('API /ordens', () => {
     const r = await request(app).post('/api/ordens').send({ veiculoId: 99999999999, descricaoProblema: 'abc' });
     expect(r.status).toBe(400);
     const os = await criarOS();
-    const item = await request(app).post(`/api/ordens/${os.id}/itens`).send({ descricao: 'X', quantidade: 3000000000, valorUnitario: 1 });
+    const item = await request(app)
+      .post(`/api/ordens/${os.id}/itens`)
+      .send({ descricao: 'X', quantidade: 3000000000, valorUnitario: 1 });
     expect(item.status).toBe(400);
   });
 

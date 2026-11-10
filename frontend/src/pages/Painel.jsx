@@ -71,7 +71,11 @@ export default function Painel() {
                     {PROXIMOS[o.status].length > 0 && (
                       <div className="card-acoes">
                         {PROXIMOS[o.status].map((s) => (
-                          <button key={s} className={`btn btn-sm ${s === 'CANCELADA' ? 'btn-fantasma' : ''}`} onClick={() => mudarStatus(o, s)}>
+                          <button
+                            key={s}
+                            className={`btn btn-sm ${s === 'CANCELADA' ? 'btn-fantasma' : ''}`}
+                            onClick={() => mudarStatus(o, s)}
+                          >
                             {ACAO[s]}
                           </button>
                         ))}

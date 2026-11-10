@@ -89,7 +89,10 @@ export default function Crud({ titulo, subtitulo, recurso, nomeItem, colunas, ro
                     <button className="btn btn-sm" onClick={() => abrir(item)}>
                       Editar
                     </button>
-                    <button className="btn btn-sm btn-fantasma" onClick={() => excluir({ ...item, rotulo: rotulo(item) })}>
+                    <button
+                      className="btn btn-sm btn-fantasma"
+                      onClick={() => excluir({ ...item, rotulo: rotulo(item) })}
+                    >
                       Excluir
                     </button>
                   </td>
@@ -102,7 +105,13 @@ export default function Crud({ titulo, subtitulo, recurso, nomeItem, colunas, ro
 
       {editando && (
         <Modal titulo={editando.id ? `Editar ${nomeItem}` : `Novo ${nomeItem}`} onFechar={() => setEditando(null)}>
-          <Formulario inicial={editando} onSalvar={salvar} onCancelar={() => setEditando(null)} falha={falha} enviando={enviando} />
+          <Formulario
+            inicial={editando}
+            onSalvar={salvar}
+            onCancelar={() => setEditando(null)}
+            falha={falha}
+            enviando={enviando}
+          />
         </Modal>
       )}
     </section>

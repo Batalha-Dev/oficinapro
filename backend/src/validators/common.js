@@ -4,7 +4,9 @@ const { z } = require('zod');
 const PLACA_REGEX = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
 
 function normalizarPlaca(valor) {
-  return String(valor).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  return String(valor)
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
 }
 
 const idParam = z.coerce

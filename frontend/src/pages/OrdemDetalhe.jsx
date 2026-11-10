@@ -46,7 +46,10 @@ export default function OrdemDetalhe() {
             <button
               key={s}
               className={`btn ${s === 'CANCELADA' ? 'btn-fantasma' : 'btn-primario'}`}
-              onClick={() => (s !== 'CANCELADA' || confirm('Cancelar esta OS?')) && executar(() => api.patch(`/ordens/${os.id}/status`, { status: s }))}
+              onClick={() =>
+                (s !== 'CANCELADA' || confirm('Cancelar esta OS?')) &&
+                executar(() => api.patch(`/ordens/${os.id}/status`, { status: s }))
+              }
             >
               {ACAO[s]}
             </button>
@@ -93,7 +96,10 @@ export default function OrdemDetalhe() {
                     <td data-titulo="Subtotal">{moeda(i.valorUnitario * i.quantidade)}</td>
                     {!fechada && (
                       <td className="acoes">
-                        <button className="btn btn-sm btn-fantasma" onClick={() => executar(() => api.del(`/ordens/${os.id}/itens/${i.id}`))}>
+                        <button
+                          className="btn btn-sm btn-fantasma"
+                          onClick={() => executar(() => api.del(`/ordens/${os.id}/itens/${i.id}`))}
+                        >
                           Remover
                         </button>
                       </td>
@@ -119,9 +125,30 @@ export default function OrdemDetalhe() {
                 });
               }}
             >
-              <input required placeholder="Peça ou serviço" value={item.descricao} onChange={(e) => setItem({ ...item, descricao: e.target.value })} />
-              <input required type="number" min={1} aria-label="Quantidade" value={item.quantidade} onChange={(e) => setItem({ ...item, quantidade: e.target.value })} />
-              <input required type="number" min={0} step="0.01" placeholder="Valor R$" aria-label="Valor unitário" value={item.valorUnitario} onChange={(e) => setItem({ ...item, valorUnitario: e.target.value })} />
+              <input
+                required
+                placeholder="Peça ou serviço"
+                value={item.descricao}
+                onChange={(e) => setItem({ ...item, descricao: e.target.value })}
+              />
+              <input
+                required
+                type="number"
+                min={1}
+                aria-label="Quantidade"
+                value={item.quantidade}
+                onChange={(e) => setItem({ ...item, quantidade: e.target.value })}
+              />
+              <input
+                required
+                type="number"
+                min={0}
+                step="0.01"
+                placeholder="Valor R$"
+                aria-label="Valor unitário"
+                value={item.valorUnitario}
+                onChange={(e) => setItem({ ...item, valorUnitario: e.target.value })}
+              />
               <button className="btn btn-primario">Adicionar</button>
             </form>
           )}

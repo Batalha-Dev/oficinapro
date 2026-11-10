@@ -5,7 +5,14 @@ const { prisma, limparBanco, criarCliente, criarVeiculo } = require('./helpers')
 beforeEach(limparBanco);
 afterAll(() => prisma.$disconnect());
 
-const novo = (clienteId, extra = {}) => ({ placa: 'abc-1d23', marca: 'Fiat', modelo: 'Argo', ano: 2022, clienteId, ...extra });
+const novo = (clienteId, extra = {}) => ({
+  placa: 'abc-1d23',
+  marca: 'Fiat',
+  modelo: 'Argo',
+  ano: 2022,
+  clienteId,
+  ...extra,
+});
 
 describe('API /veiculos', () => {
   test('RN1: POST normaliza a placa', async () => {
@@ -25,7 +32,13 @@ describe('API /veiculos', () => {
 
   test('placa inválida retorna 400', async () => {
     const c = await criarCliente();
-    expect((await request(app).post('/api/veiculos').send(novo(c.id, { placa: 'XX123' }))).status).toBe(400);
+    expect(
+      (
+        await request(app)
+          .post('/api/veiculos')
+          .send(novo(c.id, { placa: 'XX123' }))
+      ).status
+    ).toBe(400);
   });
 
   test('cliente inexistente retorna 404', async () => {

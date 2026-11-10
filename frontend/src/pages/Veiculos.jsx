@@ -44,7 +44,14 @@ function FormVeiculo({ inicial, onSalvar, onCancelar, falha, enviando }) {
       <div className="form-duplo">
         <label>
           Placa
-          <input required placeholder="ABC1D23" maxLength={8} autoFocus style={{ textTransform: 'uppercase' }} {...campo('placa')} />
+          <input
+            required
+            placeholder="ABC1D23"
+            maxLength={8}
+            autoFocus
+            style={{ textTransform: 'uppercase' }}
+            {...campo('placa')}
+          />
         </label>
         <label>
           Ano

@@ -37,7 +37,9 @@ describe('API /clientes', () => {
 
   test('CPF duplicado retorna 409', async () => {
     await criarCliente({ cpf: '52998224725' });
-    const res = await request(app).post('/api/clientes').send({ nome: 'Outro', telefone: '49988887777', cpf: '529.982.247-25' });
+    const res = await request(app)
+      .post('/api/clientes')
+      .send({ nome: 'Outro', telefone: '49988887777', cpf: '529.982.247-25' });
     expect(res.status).toBe(409);
     expect(res.body.erro).toMatch(/CPF/);
   });

@@ -18,7 +18,10 @@ function errorHandler(err, req, res, next) {
   }
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
-      const alvo = [].concat(err.meta?.target || []).map((c) => CAMPOS[c] || c).join(', ');
+      const alvo = []
+        .concat(err.meta?.target || [])
+        .map((c) => CAMPOS[c] || c)
+        .join(', ');
       return res.status(409).json({ erro: `Já existe um cadastro com este(a) ${alvo || 'valor'}` });
     }
     if (err.code === 'P2025') return res.status(404).json({ erro: 'Registro não encontrado' });

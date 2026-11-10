@@ -14,12 +14,20 @@ const itemSchema = z.object({
 
 const ordemSchema = z.object({
   veiculoId: idParam,
-  descricaoProblema: z.string({ required_error: 'Descreva o problema' }).trim().min(3, 'Descrição muito curta').max(500),
+  descricaoProblema: z
+    .string({ required_error: 'Descreva o problema' })
+    .trim()
+    .min(3, 'Descrição muito curta')
+    .max(500),
   itens: z.array(itemSchema).optional().default([]),
 });
 
 const ordemUpdateSchema = z.object({
-  descricaoProblema: z.string({ required_error: 'Descreva o problema' }).trim().min(3, 'Descrição muito curta').max(500),
+  descricaoProblema: z
+    .string({ required_error: 'Descreva o problema' })
+    .trim()
+    .min(3, 'Descrição muito curta')
+    .max(500),
 });
 
 const statusSchema = z.object({

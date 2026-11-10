@@ -28,7 +28,11 @@ async function criar(dados) {
 async function atualizar(id, dados) {
   await buscar(id);
   await garantirCliente(dados.clienteId);
-  return prisma.veiculo.update({ where: { id }, data: dados, include: { cliente: { select: { id: true, nome: true } } } });
+  return prisma.veiculo.update({
+    where: { id },
+    data: dados,
+    include: { cliente: { select: { id: true, nome: true } } },
+  });
 }
 
 // RN3: veículo com ordens de serviço não pode ser excluído (preserva histórico).
