@@ -14,6 +14,7 @@ export default function OrdemDetalhe() {
   const [aviso, setAviso] = useState(null);
 
   async function executar(fn) {
+    setAviso(null);
     try {
       await fn();
       recarregar();

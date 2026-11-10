@@ -11,7 +11,7 @@ import Modal from './Modal.jsx';
  * colunas: [{ titulo, render(item) }]
  * Formulario: componente ({ inicial, onSalvar, onCancelar, falha, enviando })
  */
-export default function Crud({ titulo, subtitulo, recurso, nomeItem, colunas, Formulario, vazio }) {
+export default function Crud({ titulo, subtitulo, recurso, nomeItem, colunas, rotulo, Formulario, vazio }) {
   const { dados, carregando, erro, recarregar } = useRecurso(`/${recurso}`);
   const [editando, setEditando] = useState(null); // null fechado, {} novo, item edição
   const [falha, setFalha] = useState(null);
@@ -21,6 +21,7 @@ export default function Crud({ titulo, subtitulo, recurso, nomeItem, colunas, Fo
   async function salvar(valores) {
     setEnviando(true);
     setFalha(null);
+    setAviso(null);
     try {
       if (editando.id) await api.put(`/${recurso}/${editando.id}`, valores);
       else await api.post(`/${recurso}`, valores);
@@ -35,6 +36,7 @@ export default function Crud({ titulo, subtitulo, recurso, nomeItem, colunas, Fo
 
   async function excluir(item) {
     if (!confirm(`Excluir ${nomeItem} "${item.rotulo}"?`)) return;
+    setAviso(null);
     try {
       await api.del(`/${recurso}/${item.id}`);
       recarregar();
@@ -87,7 +89,7 @@ export default function Crud({ titulo, subtitulo, recurso, nomeItem, colunas, Fo
                     <button className="btn btn-sm" onClick={() => abrir(item)}>
                       Editar
                     </button>
-                    <button className="btn btn-sm btn-fantasma" onClick={() => excluir({ ...item, rotulo: colunas[0].render(item) })}>
+                    <button className="btn btn-sm btn-fantasma" onClick={() => excluir({ ...item, rotulo: rotulo(item) })}>
                       Excluir
                     </button>
                   </td>

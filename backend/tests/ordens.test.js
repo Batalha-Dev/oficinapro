@@ -90,6 +90,21 @@ describe('API /ordens', () => {
     expect((await request(app).get('/api/ordens?status=XYZ')).status).toBe(400);
   });
 
+  test('RN6: OS cancelada não pode ser excluída', async () => {
+    const os = await criarOS();
+    await status(os.id, 'CANCELADA');
+    expect((await request(app).delete(`/api/ordens/${os.id}`)).status).toBe(422);
+  });
+
+  test('IDs e quantidades fora do limite retornam 400, não 500', async () => {
+    expect((await request(app).get('/api/ordens/99999999999')).status).toBe(400);
+    const r = await request(app).post('/api/ordens').send({ veiculoId: 99999999999, descricaoProblema: 'abc' });
+    expect(r.status).toBe(400);
+    const os = await criarOS();
+    const item = await request(app).post(`/api/ordens/${os.id}/itens`).send({ descricao: 'X', quantidade: 3000000000, valorUnitario: 1 });
+    expect(item.status).toBe(400);
+  });
+
   test('rota inexistente retorna 404 em JSON', async () => {
     const res = await request(app).get('/api/nada');
     expect(res.status).toBe(404);

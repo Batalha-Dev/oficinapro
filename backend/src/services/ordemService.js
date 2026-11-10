@@ -56,8 +56,9 @@ async function atualizar(id, { descricaoProblema }) {
   return formatar(await prisma.ordemServico.update({ where: { id }, data: { descricaoProblema }, include: INCLUDE }));
 }
 
+// OS finalizada é histórico: não pode ser apagada (RN6).
 async function remover(id) {
-  await carregar(id);
+  await carregarAberta(id);
   await prisma.ordemServico.delete({ where: { id } });
 }
 

@@ -15,6 +15,7 @@ export default function Painel() {
 
   async function mudarStatus(ordem, status) {
     if (status === 'CANCELADA' && !confirm(`Cancelar a OS #${ordem.id}?`)) return;
+    setAviso(null);
     try {
       await api.patch(`/ordens/${ordem.id}/status`, { status });
       recarregar();

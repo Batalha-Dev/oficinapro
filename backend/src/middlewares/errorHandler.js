@@ -24,6 +24,9 @@ function errorHandler(err, req, res, next) {
     if (err.code === 'P2025') return res.status(404).json({ erro: 'Registro não encontrado' });
     if (err.code === 'P2003') return res.status(409).json({ erro: 'Registro possui vínculos e não pode ser alterado' });
   }
+  if (err instanceof Prisma.PrismaClientValidationError) {
+    return res.status(400).json({ erro: 'Dados inválidos' });
+  }
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ erro: 'JSON malformado' });
   }

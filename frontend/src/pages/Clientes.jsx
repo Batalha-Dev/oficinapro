@@ -56,6 +56,7 @@ export default function Clientes() {
       recurso="clientes"
       nomeItem="cliente"
       colunas={colunas}
+      rotulo={(c) => c.nome}
       Formulario={FormCliente}
       vazio="Nenhum cliente cadastrado ainda."
     />

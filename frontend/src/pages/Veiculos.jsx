@@ -74,6 +74,7 @@ export default function Veiculos() {
       recurso="veiculos"
       nomeItem="veículo"
       colunas={colunas}
+      rotulo={(v) => formatarPlaca(v.placa)}
       Formulario={FormVeiculo}
       vazio="Nenhum veículo cadastrado. Cadastre um cliente primeiro."
     />

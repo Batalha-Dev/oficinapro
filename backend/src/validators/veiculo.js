@@ -1,4 +1,4 @@
-const { z, PLACA_REGEX, normalizarPlaca } = require('./common');
+const { z, PLACA_REGEX, normalizarPlaca, idParam } = require('./common');
 
 const anoMax = () => new Date().getFullYear() + 1;
 
@@ -14,7 +14,7 @@ const veiculoSchema = z.object({
     .int('Ano inválido')
     .min(1950, 'Ano mínimo é 1950')
     .refine((a) => a <= anoMax(), `Ano máximo é ${anoMax()}`),
-  clienteId: z.coerce.number({ invalid_type_error: 'Cliente inválido' }).int().positive('Cliente é obrigatório'),
+  clienteId: idParam,
 });
 
 module.exports = { veiculoSchema };

@@ -10,7 +10,8 @@ function normalizarPlaca(valor) {
 const idParam = z.coerce
   .number({ invalid_type_error: 'ID deve ser numérico' })
   .int('ID inválido')
-  .positive('ID inválido');
+  .positive('ID inválido')
+  .max(2147483647, 'ID inválido'); // limite do INT4 do Postgres: evita erro 500
 
 // String opcional: "" ou só espaços vira undefined (não grava vazio no banco).
 const textoOpcional = z.preprocess(
