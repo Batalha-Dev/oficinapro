@@ -28,9 +28,9 @@ async function carregarAberta(id) {
   return ordem;
 }
 
-async function listar({ status } = {}) {
+async function listar({ status, veiculoId } = {}) {
   const ordens = await prisma.ordemServico.findMany({
-    where: status ? { status } : undefined,
+    where: { ...(status && { status }), ...(veiculoId && { veiculoId }) },
     orderBy: { abertaEm: 'desc' },
     include: INCLUDE,
   });

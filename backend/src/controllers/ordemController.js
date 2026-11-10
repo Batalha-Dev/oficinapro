@@ -5,7 +5,8 @@ const { idParam, z } = require('../validators/common');
 const filtroStatus = z.enum(STATUS, { errorMap: () => ({ message: 'Status inválido' }) }).optional();
 
 async function listar(req, res) {
-  res.json(await service.listar({ status: filtroStatus.parse(req.query.status || undefined) }));
+  const veiculoId = req.query.veiculoId ? idParam.parse(req.query.veiculoId) : undefined;
+  res.json(await service.listar({ status: filtroStatus.parse(req.query.status || undefined), veiculoId }));
 }
 
 async function buscar(req, res) {

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Crud, { AcoesForm } from '../components/Crud.jsx';
 import { useRecurso } from '../api/useRecurso.js';
 import { formatarPlaca } from '../api/client.js';
@@ -8,7 +9,14 @@ const colunas = [
   { titulo: 'Veículo', render: (v) => `${v.marca} ${v.modelo}` },
   { titulo: 'Ano', render: (v) => v.ano },
   { titulo: 'Cliente', render: (v) => v.cliente.nome },
-  { titulo: 'OS', render: (v) => v._count?.ordens ?? 0 },
+  {
+    titulo: 'Histórico',
+    render: (v) => (
+      <Link to={`/veiculos/${v.id}`} className="link-historico">
+        {v._count?.ordens ?? 0} OS →
+      </Link>
+    ),
+  },
 ];
 
 function FormVeiculo({ inicial, onSalvar, onCancelar, falha, enviando }) {
